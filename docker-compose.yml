@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  cli:
+    build: ./aws-cli
+    container_name: awscli-container
+    volumes:
+      - .:/workdir
+    env_file:
+      - ./aws-cli/.env
+    environment:
+      AWS_DEFAULT_REGION: ap-northeast-1
+      AWS_DEFAULT_OUTPUT: json
+      AWS_URL: http://aws:4000
+    tty: true
+  aws:
+    image: motoserver/moto:latest
+    container_name: aws
+    environment:
+      MOTO_PORT: 4000
+    ports:
+      - "8080:4000"
