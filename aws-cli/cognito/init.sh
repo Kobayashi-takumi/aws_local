@@ -7,6 +7,8 @@ USER_POOL_ID=$(
     --query UserPool.Id \
     --output text \
     --endpoint-url ${AWS_URL} \
+    --username-attributes email \
+    --policies '{"PasswordPolicy":{"MinimumLength":8,"RequireUppercase":true,"RequireLowercase":true,"RequireNumbers":true,"RequireSymbols":false}}' \
 )
 
 if [ -z "$USER_POOL_ID" ]; then
