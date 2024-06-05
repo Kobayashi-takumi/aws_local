@@ -23,6 +23,8 @@ pub struct Config {
     pub s3_domain: String,
     /// ローカル用のエンドポイント
     pub endpoint_url: Option<String>,
+    /// ローカル環境
+    pub is_local: bool,
 }
 
 impl Config {
@@ -59,6 +61,7 @@ impl Config {
             Error::ConfigurationError("S3_DOMAIN".to_string())
         })?;
         let endpoint_url = var("ENDPOINT_URL").map_or(None, |v| Some(v));
+        let is_local = var("ENVIRONMENT").map_or(false, |v| v == "local");
         Ok(Self {
             pool_id,
             client_id,
@@ -68,6 +71,7 @@ impl Config {
             bucket_name,
             s3_domain,
             endpoint_url,
+            is_local,
         })
     }
 }

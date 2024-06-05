@@ -1,4 +1,7 @@
-use crate::error::{Error, Result};
+use crate::{
+    config::Config,
+    error::{Error, Result},
+};
 use aws_config::BehaviorVersion;
 use aws_sdk_cognitoidentityprovider::{
     config::{Credentials, Region},
@@ -27,6 +30,38 @@ pub trait AuthGateway {
     async fn delete(&self, email: &str) -> Result<()>;
     async fn update(&self, email: &str, new_email: &str) -> Result<()>;
     async fn get_token(&self, email: &str, password: &str) -> Result<String>;
+}
+
+pub struct AuthGatewayFactory;
+
+impl AuthGatewayFactory {
+    pub async fn create(config: Config) -> Result<Box<dyn AuthGateway>> {
+        if config.is_local {
+            Ok(Box::new(
+                MocClient::new(
+                    config.pool_id.clone(),
+                    config.client_id.clone(),
+                    config.aws_access_key.clone(),
+                    config.aws_secret_key.clone(),
+                    config.region.clone(),
+                    config.endpoint_url.clone().ok_or(Error::Unknown)?,
+                )
+                .await?,
+            ))
+        } else {
+            Ok(Box::new(
+                Client::new(
+                    config.pool_id.clone(),
+                    config.client_id.clone(),
+                    config.aws_access_key.clone(),
+                    config.aws_secret_key.clone(),
+                    config.region.clone(),
+                    config.endpoint_url,
+                )
+                .await?,
+            ))
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -551,15 +586,7 @@ mod test {
             Error::ConfigurationError("COGNITO_TEST_NEW_EMAIL".to_string())
         })?;
         let config = Config::new()?;
-        let client = MocClient::new(
-            config.pool_id.clone(),
-            config.client_id.clone(),
-            config.aws_access_key.clone(),
-            config.aws_secret_key.clone(),
-            config.region.clone(),
-            config.endpoint_url.clone().ok_or(Error::Unknown)?,
-        )
-        .await?;
+        let client = AuthGatewayFactory::create(config).await?;
         client.sing_up(&email, &password).await?;
         // client.verify(&email, &verification_code).await?;
         client.force_verify(&email).await?;
