@@ -10,3 +10,8 @@ init:
 	docker compose exec cli /bin/bash -c "chmod a+x ./aws-cli/ses/init.sh && ./aws-cli/ses/init.sh"
 aws:
 	docker compose exec aws /bin/bash
+app:
+	docker compose exec aws_app bash
+test:
+	docker compose run --rm aws_app sh -c "RUST_LOG=debug cargo test --all"
+
