@@ -51,6 +51,8 @@ motoを使用したローカルAWS環境
 - BUCKET_NAME=<init時に作成したS3のバケット名　もしくは　AWSで作成したバケット名>
 - S3_DOMAIN=http://aws:4000
     - awsコンテナのパス(ローカル以外のAWSを利用する場合は正しいS3のDomainにする)
+- ENVIRONMENT=local
+    - localにすると、cognitoがMocClientになる
 - COGNITO_TEST_EMAIL=<テスト時に作成するユーザのEmail>
 - COGNITO_TEST_NEW_EMAIL=<テスト時に更新するユーザのEmail>
 - COGNITO_TEST_PASSWORD=<テスト時に作成するユーザのパスワード>
